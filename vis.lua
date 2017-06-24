@@ -2,6 +2,13 @@
 local ffi = require("ffi")
 local bit = require("bit")
 local love = love
+local shader = love.graphics.newShader [[
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
+{
+	vec4 c = Texel(texture, texture_coords);
+	return vec4(c.bgr, 1.0);
+}
+]]
 
 local function isolate_globals(func)
 	local env = {}
@@ -162,6 +169,7 @@ function SoniqueVis.New(visname, x, y)
 	this.VisObj = SoniqueVis._vislist[visname]
 	this.ImageData = love.image.newImageData(x, y)
 	this.ImageDataPtr = ffi.cast("unsigned long*", this.ImageData:getPointer())
+	this.ImageDataPtrChar = ffi.cast("uint8_t*", this.ImageDataPtr)
 	this.X, this.Y = x, y
 	this.Image = love.graphics.newImage(this.ImageData)
 	this.VisData = ffi.new("VisData[1]")
@@ -221,12 +229,22 @@ function visobj.Update(this, dt, premul1000)
 		end
 	end
 	
+	for i = 1, this.X * this.Y * 4 do
+		this.ImageDataPtrChar[i - 1] = math.max(this.ImageDataPtrChar[i - 1] - 32, 0)
+	end
+	
 	this.VisObj.VisInfo.Render(this.ImageDataPtr, this.X, this.Y, this.X, this.VisData)
 	this.Image:refresh()
 end
 
 function visobj.Draw(this, ...)
-	graphics_draw(this.Image, ...)
+	if not(love.graphics.getShader()) then
+		love.graphics.setShader(shader)
+		graphics_draw(this.Image, ...)
+		love.graphics.setShader(nil)
+	else
+		graphics_draw(this.Image, ...)
+	end
 end
 
 function visobj.Click(this, x, y, button)
@@ -238,7 +256,8 @@ end
 
 function love.graphics.draw(obj, ...)
 	if type(obj) == "table" and obj.Type == "SoniqueVisualizer" then
-		obj = obj.Image
+		obj:Draw(...)
+		return
 	end
 	
 	graphics_draw(obj, ...)

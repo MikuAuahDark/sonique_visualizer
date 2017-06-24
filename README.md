@@ -1,8 +1,7 @@
 LOVE2D Sonique Visualizer
 =========================
 
-Another proof-of-concept of loading Sonique Visualizer plugin to LOVE2D and display it.  
-Well, not all visualizer is supported. Some might works, some might simply display black screen.
+Another proof-of-concept of loading Sonique Visualizer plugin to LOVE2D and display it.
 
 **Windows 32-bit is only the supported platform! Windows 64-bit or any other OS is not supported!**
 
@@ -22,6 +21,19 @@ Run it with LOVE2D
 
 If no `visualizer_name` specificed, it defaults to "Rabbit Hole"
 
+The "vis" script can be changed in `main.lua` line 3. It can be `vis` for FFT without KissFFT (uses LuaFFT; slower) or `vis_kissfft` for FFT using KissFFT (faster).
+
+Notes
+-----
+
+* The pixel format is BGRA, as you can see in `vis.lua` line 9
+
+  * Unfortunately, some visualizer didn't set alpha channel, so 1.0 is always supplied there
+  
+  * You need to take this into account if you want to use custom shader when drawing the visualizer
+
+* Some visualizer can accept mouse clicks
+
 Screenshot
 ----------
 
@@ -30,14 +42,14 @@ Screenshot
 License
 -------
 
-File `main.lua`, `vis.lua`, and `vis_kissfft.lua` is released under public domain. **But please see disclaimer below!**
+File `main.lua`, `vis.lua`, and `vis_kissfft.lua` is released under public domain (holefully). **But please see disclaimer below!**
 
 Disclaimer
 ----------
 
 * Sonique and it's plugins belongs to their respective owner.
 
-* LuaFFT by Benjamin von Ardenne. See `luafft.lua` for more details.
+* LuaFFT is licensed. See `luafft.lua` for more details.
 
 ### KissFFT
 

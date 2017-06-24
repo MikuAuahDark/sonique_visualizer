@@ -4,13 +4,6 @@ local SoniqueVis = require("vis_kissfft")
 local AudioObj
 local SDObj
 local VisObj
-local shader = love.graphics.newShader [[
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
-{
-	vec4 c = Texel(texture, texture_coords);
-	return 1.0 - c;
-}
-]]
 
 function love.load(arg)
 	if love.filesystem.isFused() == false then
@@ -20,7 +13,7 @@ function love.load(arg)
 	local f = assert(io.open(arg[1], "rb"))
 	SDObj = love.sound.newSoundData(love.filesystem.newFileData(f:read("*a"), arg[1]))
 	AudioObj = love.audio.newSource(SDObj)
-	VisObj = SoniqueVis.New("./sonique_visualizer/"..(arg[2] or "Rabbit Hole")..".dll", 320, 240)
+	VisObj = SoniqueVis.New("./sonique_visualizer/"..(arg[2] or "Rabbit Hole")..".dll", 800, 600)
 		:Link(AudioObj, SDObj)
 	
 	AudioObj:play()
@@ -32,12 +25,13 @@ function love.update(dt)
 end
 
 function love.draw()
-	love.graphics.draw(VisObj, 0, 0, 0, 2.5)
+	love.graphics.draw(VisObj)
 	love.graphics.print(love.timer.getFPS().." FPS")
 end
 
 function love.mousereleased(x, y, button)
-	VisObj:Click(x / 2.5, y / 2.5, button)
+	--VisObj:Click(x / 2.5, y / 2.5, button)
+	VisObj:Click(x, y, button)
 end
 
 function love.keyreleased(key)
